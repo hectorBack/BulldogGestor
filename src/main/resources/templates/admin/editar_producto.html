@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Producto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+<div class="container mx-auto p-6">
+    <header class="mb-6">
+        <h1 class="text-3xl font-bold text-orange-600">Editar Producto</h1>
+        <p class="text-gray-600">Modifica los detalles del producto y guarda los cambios.</p>
+    </header>
+
+    <!-- Formulario de edición -->
+    <form th:action="@{'/admin/productos/editar/' + ${producto.id}}" method="post" enctype="multipart/form-data"
+          class="bg-white p-6 shadow-md rounded-lg">
+
+        <div class="mb-4">
+            <label for="nombre" class="block text-gray-700 font-medium">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" th:value="${producto.nombre}" required
+                   class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-orange-300">
+        </div>
+
+        <div class="mb-4">
+            <label for="descripcion" class="block text-gray-700 font-medium">Descripción:</label>
+            <input type="text" id="descripcion" name="descripcion" th:value="${producto.descripcion}" required
+                   class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-orange-300">
+        </div>
+
+        <div class="mb-4">
+            <label for="precio" class="block text-gray-700 font-medium">Precio:</label>
+            <input type="number" id="precio" name="precio" th:value="${producto.precio}" step="0.01" required
+                   class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-orange-300">
+        </div>
+
+        <div class="mb-4">
+            <label for="categoria" class="block text-gray-700 font-medium">Categoría:</label>
+            <input type="text" id="categoria" name="categoria" th:value="${producto.categoria}" required
+                   class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-orange-300">
+        </div>
+
+        <!-- Vista previa de la imagen actual -->
+        <div class="mb-4">
+            <label class="block text-gray-700 font-medium">Imagen actual:</label>
+            <img th:src="@{'/uploads/' + ${producto.imagenUrl}}" alt="Imagen del producto" class="w-40 h-40 object-cover rounded-md border">
+        </div>
+
+        <!-- Campo para subir una nueva imagen -->
+        <div class="mb-4">
+            <label for="imagen" class="block text-gray-700 font-medium">Nueva Imagen:</label>
+            <input type="file" id="imagen" name="imagen" accept="image/*"
+                   class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-orange-300">
+        </div>
+
+        <div class="flex items-center space-x-4">
+            <button type="submit"
+                    class="bg-orange-600 text-white py-2 px-6 rounded-md hover:bg-orange-700 transition">
+                Guardar Cambios
+            </button>
+            <a th:href="@{'/admin/productos'}"
+               class="text-gray-700 underline hover:text-orange-600">
+                Cancelar
+            </a>
+        </div>
+
+    </form>
+</div>
+</body>
+</html>
+
+

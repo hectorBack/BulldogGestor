@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Pedidos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50">
+
+<!-- Header -->
+<header class="bg-orange-600 text-white shadow-lg">
+    <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
+        <h1 class="text-2xl font-bold flex items-center">
+            <i class="fas fa-list mr-3"></i> Gestión de Pedidos
+        </h1>
+        <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4">
+            <a th:href="@{/pedidos/crear}"
+               class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center transition-all">
+                <i class="fas fa-plus mr-2"></i> Nuevo Pedido
+            </a>
+            <a th:href="@{/pedidos/historico}"
+               class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center transition-all">
+                <i class="fas fa-history mr-2"></i> Histórico de Pedidos
+            </a>
+            <a th:href="@{/admin/logout}"
+               class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg flex items-center transition-all">
+                <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Main content -->
+<main class="container mx-auto mt-8 px-4 pb-8">
+
+    <!-- Alertas -->
+    <div th:if="${error}" class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg shadow-sm">
+        <p th:text="${error}"></p>
+    </div>
+
+    <!-- Sección de Pedidos de Hoy -->
+    <section class="bg-white rounded-xl shadow-md mb-8 overflow-hidden">
+        <div class="px-6 py-4 border-b">
+            <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                <i class="fas fa-calendar-day mr-2 text-orange-500"></i> Pedidos de Hoy
+            </h2>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">ID</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Fecha</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Usuario</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Cliente</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Tipo</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Estado</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Productos</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Total</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Notas</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Acciones</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                <tr th:each="pedido : ${pedidosHoy}" class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm text-gray-700">#<span th:text="${pedido.id}"></span></td>
+                    <td class="px-6 py-4 text-sm text-gray-600" th:text="${pedido.fecha}"></td>
+                    <td class="px-6 py-4 text-sm text-gray-800" th:text="${pedido.usuario.nombre}"></td>
+                    <td class="px-6 py-4 text-sm text-gray-600" th:text="${pedido.clienteIdentificador}"></td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-chair text-orange-500" th:if="${pedido.tipoPedido == 'Mesa'}"></i>
+                            <i class="fas fa-shopping-bag text-blue-500" th:if="${pedido.tipoPedido == 'Llevar'}"></i>
+                            <i class="fas fa-motorcycle text-green-500" th:if="${pedido.tipoPedido == 'Domicilio'}"></i>
+                            <span class="text-sm text-gray-700" th:text="${pedido.tipoPedido}"></span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                            <span class="px-3 py-1 rounded-full text-sm font-medium"
+                                  th:class="${pedido.estado == 'Completado' ? 'bg-green-100 text-green-800' :
+                                             pedido.estado == 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
+                                             'bg-red-100 text-red-800'}"
+                                  th:text="${pedido.estado}"></span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="space-y-1">
+                            <div th:each="pedidoProducto : ${pedido.productos}"
+                                 class="flex items-center space-x-2 text-sm text-gray-600">
+                                <span th:text="${pedidoProducto.producto.nombre}"></span>
+                                <span class="text-gray-400">x</span>
+                                <span th:text="${pedidoProducto.cantidad}"></span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm font-semibold text-gray-800"
+                        th:text="'$' + ${#numbers.formatDecimal(pedido.total, 1, 2)}"></td>
+
+                    <!-- 🔹 Nueva columna Notas -->
+                    <td class="px-6 py-4 text-sm text-gray-700" th:text="${pedido.notas != null ? pedido.notas : '-'}"></td>
+
+                    <td class="px-6 py-4">
+                        <div class="flex space-x-2">
+                            <a th:href="@{/pedidos/{id}/detalles(id=${pedido.id})}"
+                               class="p-2 text-gray-500 hover:text-blue-600 rounded-lg hover:bg-gray-100 transition-all"
+                               title="Ver Detalles">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a th:href="@{/pedidos/editar/{id}(id=${pedido.id})}"
+                               class="p-2 text-gray-500 hover:text-yellow-600 rounded-lg hover:bg-gray-100 transition-all"
+                               title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form th:action="@{/pedidos/eliminar/{id}(id=${pedido.id})}" method="post">
+                                <button type="submit"
+                                        class="p-2 text-gray-500 hover:text-red-600 rounded-lg hover:bg-gray-100 transition-all"
+                                        title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                            <form th:action="@{/pedidos/cambiar-estado/{id}(id=${pedido.id})}" method="post" class="cambiar-estado-form">
+                                <button type="submit"
+                                        class="p-2 text-gray-500 hover:text-purple-600 rounded-lg hover:bg-gray-100 transition-all"
+                                        title="Cambiar Estado">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+
+    <!-- Total de ventas -->
+    <div class="mt-6 p-6 bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium">TOTAL DEL DÍA</p>
+                <p class="text-2xl font-bold" th:text="'$' + ${#numbers.formatDecimal(totalVentasHoy, 1, 2)}"></p>
+            </div>
+            <i class="fas fa-chart-line text-3xl opacity-75"></i>
+        </div>
+    </div>
+
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".cambiar-estado-form").forEach(form => {
+            form.addEventListener("submit", function (event) {
+                event.preventDefault(); // Evita la recarga de la página
+
+                let formData = new FormData(this);
+                let actionUrl = this.action;
+
+                fetch(actionUrl, {
+                    method: "POST",
+                    body: formData
+                }).then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    }
+                    throw new Error("Error al cambiar el estado");
+                }).then(() => {
+                    location.reload(); // Recarga solo después de completar la solicitud
+                }).catch(error => {
+                    console.error(error);
+                    alert("Hubo un error al cambiar el estado");
+                });
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
+
+

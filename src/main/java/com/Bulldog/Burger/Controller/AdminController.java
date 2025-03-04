@@ -5,10 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,15 +34,38 @@ public class AdminController {
 
     @Autowired
     private PedidoRepository pedidoRepository;
-    
+
 
     @GetMapping
     public String adminDashboard(Model model) {
         List<Pedido> pedidos = pedidoRepository.findAll();
+        Double totalIngresosHoy = pedidoRepository.obtenerTotalIngresosHoy();
+
+        // Obtener ingresos por día de la semana
+        List<Object[]> ingresosPorDiaRaw = pedidoRepository.obtenerIngresosPorDia();
+
+        // Crear un mapa con los días de la semana ordenados
+        Map<String, Double> ingresosPorDia = new LinkedHashMap<>();
+        List<String> diasSemana = Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");
+
+        for (String dia : diasSemana) {
+            ingresosPorDia.put(dia, 0.0); // Inicializar en 0
+        }
+
+        for (Object[] row : ingresosPorDiaRaw) {
+            String dia = (String) row[0];
+            Double total = (Double) row[1];
+            ingresosPorDia.put(dia, total);
+        }
+
         model.addAttribute("pedidos", pedidos);
-        return "admin/dashboard";  // Vista para el administrador
+        model.addAttribute("totalIngresosHoy", totalIngresosHoy);
+        model.addAttribute("ingresosPorDia", ingresosPorDia);
+
+        return "admin/dashboard";
     }
-    
+
+
     @GetMapping("/productos")
     public String gestionarProductos(Model model) {
             List<Producto> productos = productoRepository.findAll();

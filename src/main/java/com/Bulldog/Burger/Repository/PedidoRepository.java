@@ -15,6 +15,20 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 	@Query("SELECT p FROM Pedido p WHERE p.fecha < CURRENT_DATE")
 	List<Pedido> findPedidosAnteriores();
 
+	@Query("SELECT COALESCE(SUM(p.total), 0) FROM Pedido p WHERE DATE(p.fecha) = CURRENT_DATE")
+	Double obtenerTotalIngresosHoy();
 
-		
+	@Query(value = "SELECT DAYNAME(p.fecha) AS dia, COALESCE(SUM(p.total), 0) " +
+			"FROM pedido p " +
+			"WHERE p.fecha >= CURDATE() - INTERVAL 6 DAY " +
+			"GROUP BY dia " +
+			"ORDER BY FIELD(dia, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')",
+			nativeQuery = true)
+	List<Object[]> obtenerIngresosPorDia();
+
+
+
+
+
+
 }

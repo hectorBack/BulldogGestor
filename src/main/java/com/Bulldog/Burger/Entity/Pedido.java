@@ -26,7 +26,6 @@ public class Pedido {
 	    @JoinColumn(name = "usuario_id")
 	    private Usuario usuario;
 	    
-	    
 	    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
 	    private List<PedidoProducto> productos = new ArrayList<>();
 	    

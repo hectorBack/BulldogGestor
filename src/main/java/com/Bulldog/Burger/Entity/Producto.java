@@ -17,6 +17,7 @@ public class Producto {
     private double precio;
     private String categoria; // Ejemplo: Hamburguesas, Bebidas, Postres
     private String imagenUrl;
+
 	public Long getId() {
 		return id;
 	}

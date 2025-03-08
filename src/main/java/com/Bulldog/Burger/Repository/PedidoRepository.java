@@ -26,6 +26,13 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 			nativeQuery = true)
 	List<Object[]> obtenerIngresosPorDia();
 
+	@Query("SELECT FUNCTION('MONTHNAME', p.fecha), SUM(p.total) FROM Pedido p GROUP BY FUNCTION('MONTHNAME', p.fecha) ORDER BY FUNCTION('MONTH', p.fecha)")
+	List<Object[]> obtenerIngresosPorMes();
+
+	@Query("SELECT pp.producto.nombre, SUM(pp.cantidad) FROM PedidoProducto pp GROUP BY pp.producto.nombre ORDER BY SUM(pp.cantidad) DESC")
+	List<Object[]> obtenerProductosMasVendidos();
+
+
 
 
 

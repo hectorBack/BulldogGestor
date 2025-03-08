@@ -41,6 +41,18 @@ public class AdminController {
         List<Pedido> pedidos = pedidoRepository.findAll();
         Double totalIngresosHoy = pedidoRepository.obtenerTotalIngresosHoy();
 
+        // Calcular el total de pedidos
+        int totalPedidos = pedidos.size();
+
+        // Contar pedidos completados y pendientes
+        long pedidosCompletados = pedidos.stream()
+                .filter(p -> p.getEstado() != null && p.getEstado().trim().equalsIgnoreCase("Completado"))
+                .count();
+
+        long pedidosPendientes = pedidos.stream()
+                .filter(p -> p.getEstado() != null && p.getEstado().trim().equalsIgnoreCase("Pendiente"))
+                .count();
+
         // Obtener ingresos por día de la semana
         List<Object[]> ingresosPorDiaRaw = pedidoRepository.obtenerIngresosPorDia();
 
@@ -60,11 +72,13 @@ public class AdminController {
 
         model.addAttribute("pedidos", pedidos);
         model.addAttribute("totalIngresosHoy", totalIngresosHoy);
+        model.addAttribute("totalPedidos", totalPedidos);
+        model.addAttribute("pedidosCompletados", pedidosCompletados);
+        model.addAttribute("pedidosPendientes", pedidosPendientes);
         model.addAttribute("ingresosPorDia", ingresosPorDia);
 
         return "admin/dashboard";
     }
-
 
     @GetMapping("/productos")
     public String gestionarProductos(Model model) {
@@ -157,5 +171,37 @@ public class AdminController {
          
          return "/uploads/" + nombreUnico;
      }
-     
+
+    @GetMapping("/estadisticas")
+    public String verEstadisticas(Model model) {
+        // Consultar ingresos por mes
+        List<Object[]> ingresosPorMesRaw = pedidoRepository.obtenerIngresosPorMes();
+        Map<String, Double> ingresosPorMes = new LinkedHashMap<>();
+
+        for (Object[] row : ingresosPorMesRaw) {
+            String mes = (String) row[0];
+            Double total = (Double) row[1];
+            ingresosPorMes.put(mes, total);
+        }
+
+        // Consultar los productos más vendidos
+        List<Object[]> productosMasVendidosRaw = pedidoRepository.obtenerProductosMasVendidos();
+        List<String> productos = new ArrayList<>();
+        List<Integer> cantidades = new ArrayList<>();
+
+        for (Object[] row : productosMasVendidosRaw) {
+            productos.add((String) row[0]);
+            cantidades.add(((Number) row[1]).intValue());
+        }
+
+        model.addAttribute("meses", new ArrayList<>(ingresosPorMes.keySet()));
+        model.addAttribute("ingresosPorMes", new ArrayList<>(ingresosPorMes.values()));
+        model.addAttribute("productosMasVendidos", productos);
+        model.addAttribute("cantidadesVendidas", cantidades);
+
+        return "admin/estadisticas";
+    }
+
+
+
 }
